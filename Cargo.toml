@@ -1,8 +1,0 @@
-[package]
-name = "gwugsuh"
-description = "A multitool for the Geekworm/U-GEEK Smart UPS Hat"
-version = "0.0.0"
-edition = "2024"
-
-[dependencies]
-rppal = "0.22.1"
