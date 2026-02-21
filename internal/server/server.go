@@ -30,14 +30,19 @@ type Server struct {
 	max MaxClient
 }
 
-func Run(port int, bq BQClient, max MaxClient) error {
+func NewHandler(bq BQClient, max MaxClient) http.Handler {
 	s := &Server{
 		bq:  bq,
 		max: max,
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", s.rootHandler)
+	mux.HandleFunc("/", s.rootHandler)
+	return mux
+}
+
+func Run(port int, bq BQClient, max MaxClient) error {
+	mux := NewHandler(bq, max)
 
 	addr := fmt.Sprintf(":%d", port)
 	srv := &http.Server{
@@ -52,6 +57,11 @@ func Run(port int, bq BQClient, max MaxClient) error {
 }
 
 func (s *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
 	// Defaults
 	resp := BatteryResponse{
 		State: "Discharging", // Default assumption if we can't read anything
